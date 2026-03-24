@@ -1,0 +1,151 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  * {
+    @apply border-neutral-border;
+  }
+  body {
+    @apply bg-neutral-bg-light text-neutral-text-primary font-thai;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Button Components */
+  .btn-primary {
+    @apply bg-accent-orange hover:bg-accent-orange/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl;
+  }
+  
+  .btn-secondary {
+    @apply bg-primary-green hover:bg-primary-green-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-primary-green text-primary-green hover:bg-primary-green hover:text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200;
+  }
+  
+  .btn-ghost {
+    @apply text-neutral-text-secondary hover:text-neutral-text-primary hover:bg-neutral-bg-light font-medium py-2 px-4 rounded transition-colors duration-200;
+  }
+
+  /* Input Components */
+  .input-field {
+    @apply w-full px-4 py-3 border border-neutral-border rounded-lg focus:ring-2 focus:ring-primary-green focus:border-transparent transition-all duration-200 placeholder-neutral-text-secondary;
+  }
+  
+  .input-error {
+    @apply border-error-red focus:ring-error-red;
+  }
+
+  /* Card Components */
+  .card {
+    @apply bg-white rounded-xl shadow-lg border border-neutral-border p-6;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-xl transition-shadow duration-200;
+  }
+
+  /* Device Selection Cards */
+  .device-card {
+    @apply bg-white border-2 border-neutral-border rounded-xl p-4 cursor-pointer transition-all duration-200 hover:shadow-lg;
+  }
+  
+  .device-card.selected {
+    @apply border-primary-green bg-primary-green-light;
+  }
+
+  /* Price Display */
+  .price-highlight {
+    @apply text-2xl md:text-3xl font-bold text-accent-gold;
+  }
+  
+  .price-range {
+    @apply text-lg text-neutral-text-primary font-semibold;
+  }
+
+  /* Progress Indicator */
+  .progress-step {
+    @apply flex items-center justify-center w-8 h-8 rounded-full border-2 border-neutral-border bg-white text-neutral-text-secondary font-semibold text-sm transition-all duration-200;
+  }
+  
+  .progress-step.completed {
+    @apply bg-primary-green border-primary-green text-white;
+  }
+  
+  .progress-step.current {
+    @apply border-primary-green text-primary-green bg-primary-green-light;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    @apply px-3 py-1 rounded-full text-sm font-semibold;
+  }
+  
+  .status-new {
+    @apply bg-secondary-blue-light text-secondary-blue;
+  }
+  
+  .status-contacted {
+    @apply bg-accent-orange-light text-accent-orange;
+  }
+  
+  .status-pickup {
+    @apply bg-accent-gold-light text-accent-gold;
+  }
+  
+  .status-completed {
+    @apply bg-primary-green-light text-primary-green;
+  }
+  
+  .status-rejected {
+    @apply bg-error-red-light text-error-red;
+  }
+
+  /* Loading Animation */
+  .loading {
+    @apply animate-pulse;
+  }
+  
+  .spinner {
+    @apply animate-spin rounded-full border-4 border-neutral-border border-t-primary-green;
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .gradient-bg {
+    background: linear-gradient(135deg, #00C853 0%, #1976D2 100%);
+  }
+  
+  .gradient-text {
+    background: linear-gradient(135deg, #00C853 0%, #FFB300 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .container {
+    @apply px-4;
+  }
+  
+  .card {
+    @apply p-4;
+  }
+  
+  .btn-primary, .btn-secondary {
+    @apply py-4 text-lg;
+  }
+}

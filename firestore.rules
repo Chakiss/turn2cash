@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read/write access to leads collection for authenticated users
+    match /leads/{leadId} {
+      // Allow anyone to create leads (for the public form)
+      allow create: if true;
+      // Only allow authenticated users to read/update (for admin)
+      allow read, update: if request.auth != null;
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
