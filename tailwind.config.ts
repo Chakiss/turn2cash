@@ -36,7 +36,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        thai: ['Sarabun', 'Noto Sans Thai', 'sans-serif'],
+        sans: ['DM Sans', 'Inter', 'system-ui', 'sans-serif'],
+        thai: ['Sarabun', 'Noto Sans Thai', 'DM Sans', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

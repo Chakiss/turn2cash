@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { brandData } from '@/lib/pricing';
+import { getBrandData, getStorageOptions } from '@/lib/pricing-firestore';
 import { trackEvent } from '@/lib/firebase';
-import type { Device, EstimateStep } from '@/types';
+import type { Device, EstimateStep, BrandData } from '@/types';
 
 const steps: EstimateStep[] = [
   { step: 1, title: 'เลือกยี่ห้อ', completed: false, current: true },
@@ -47,8 +47,33 @@ export default function EstimatePage() {
     storage: '',
     condition: undefined,
   });
+  const [brandData, setBrandData] = useState<BrandData[]>([]);
   const [availableModels, setAvailableModels] = useState<string[]>([]);
   const [availableStorage, setAvailableStorage] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    trackEvent('estimate_started', { page: 'estimate' });
+    loadBrandData();
+  }, []);
+
+  const loadBrandData = async () => {
+    try {
+      console.log('🔄 Starting to load brand data...');
+      setLoading(true);
+      const brands = await getBrandData();
+      console.log('📱 Brand data loaded:', brands);
+      setBrandData(brands);
+      
+      if (brands.length === 0) {
+        console.warn('⚠️ No brands loaded from Firebase - check database and connection');
+      }
+    } catch (error) {
+      console.error('❌ Error loading brand data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     trackEvent('estimate_started', { page: 'estimate' });
@@ -72,11 +97,16 @@ export default function EstimatePage() {
     }
   };
 
-  const handleModelSelect = (model: string) => {
-    const brandInfo = brandData.find(b => b.name === device.brand);
-    if (brandInfo) {
+  const handleModelSelect = async (model: string) => {
+    try {
       setDevice(prev => ({ ...prev, model, storage: '' }));
-      setAvailableStorage(brandInfo.storageOptions);
+      const storageOptions = await getStorageOptions(device.brand!, model);
+      setAvailableStorage(storageOptions);
+      setCurrentStep(3);
+    } catch (error) {
+      console.error('Error loading storage options:', error);
+      // Fallback to basic storage options
+      setAvailableStorage(['128GB', '256GB']);
       setCurrentStep(3);
     }
   };
@@ -165,17 +195,23 @@ export default function EstimatePage() {
           {currentStep === 1 && (
             <div className="animate-fade-in">
               <h2 className="text-xl font-semibold mb-6 text-center">เลือกยี่ห้อมือถือของคุณ</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {brandData.map((brand) => (
-                  <button
-                    key={brand.name}
-                    onClick={() => handleBrandSelect(brand.name)}
-                    className={`device-card text-left ${
-                      device.brand === brand.name ? 'selected' : ''
-                    }`}
-                  >
-                    <div className="text-3xl mb-3">
-                      {brand.name === 'Apple' ? '🍎' : brand.name === 'Samsung' ? '📱' : '📞'}
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="spinner w-8 h-8 mx-auto mb-4" />
+                  <p className="text-neutral-text-secondary">กำลังโหลดข้อมูลยี่ห้อ...</p>
+                </div>
+              ) : brandData.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {brandData.map((brand) => (
+                    <button
+                      key={brand.name}
+                      onClick={() => handleBrandSelect(brand.name)}
+                      className={`device-card text-left ${
+                        device.brand === brand.name ? 'selected' : ''
+                      }`}
+                    >
+                      <div className="text-3xl mb-3">
+                      {brand.name === 'Apple' ? '🍎' : brand.name === 'Samsung' ? '📱' : brand.name === 'Google' ? '📞' : '📱'}
                     </div>
                     <h3 className="text-lg font-semibold mb-2">{brand.name}</h3>
                     <p className="text-sm text-neutral-text-secondary">
@@ -183,7 +219,22 @@ export default function EstimatePage() {
                     </p>
                   </button>
                 ))}
-              </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="text-6xl mb-4">📱</div>
+                  <h3 className="text-lg font-semibold mb-2">ไม่พบข้อมูลยี่ห้อ</h3>
+                  <p className="text-neutral-text-secondary mb-4">
+                    กำลังเชื่อมต่อกับระบบ โปรดลองใหม่อีกครั้ง
+                  </p>
+                  <button
+                    onClick={loadBrandData}
+                    className="btn-primary"
+                  >
+                    🔄 โหลดข้อมูลใหม่
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

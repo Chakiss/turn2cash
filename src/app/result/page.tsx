@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { getPriceEstimate, formatPriceRange } from '@/lib/pricing';
+import { getPriceEstimate, formatPriceRange } from '@/lib/pricing-firestore';
 import { trackEvent } from '@/lib/firebase';
 import type { Device, PriceRange } from '@/types';
 
@@ -14,6 +14,10 @@ export default function ResultPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    loadPriceEstimate();
+  }, [router]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const loadPriceEstimate = async () => {
     // Get device data from localStorage
     const savedDevice = localStorage.getItem('selectedDevice');
     if (savedDevice) {
@@ -21,8 +25,8 @@ export default function ResultPage() {
         const deviceData = JSON.parse(savedDevice) as Device;
         setDevice(deviceData);
         
-        // Get price estimate
-        const estimate = getPriceEstimate(deviceData);
+        // Get price estimate from Firestore
+        const estimate = await getPriceEstimate(deviceData);
         if (estimate) {
           setPriceRange(estimate);
           trackEvent('estimate_completed', {
@@ -38,13 +42,14 @@ export default function ResultPage() {
           router.push('/estimate');
         }
       } catch (error) {
+        console.error('Error loading price estimate:', error);
         router.push('/estimate');
       }
     } else {
       router.push('/estimate');
     }
     setLoading(false);
-  }, [router]);
+  };
 
   const handleSell = () => {
     if (device && priceRange) {

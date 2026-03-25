@@ -1,8 +1,12 @@
-import { Inter } from 'next/font/google';
+import { DM_Sans } from 'next/font/google';
 import '../styles/globals.css';
 import type { Metadata, Viewport } from 'next';
 
-const inter = Inter({ subsets: ['latin'] });
+const dmSans = DM_Sans({ 
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Turn2Cash - เปลี่ยนมือถือเก่าเป็นเงินใน 1 นาที',
@@ -36,7 +40,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className={`${inter.className} font-thai bg-neutral-bg-light min-h-screen`}>
+      <body className={`${dmSans.className} bg-neutral-bg-light min-h-screen`}>
         <main className="min-h-screen">
           {children}
         </main>

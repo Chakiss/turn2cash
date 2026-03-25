@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { formatPriceRange } from '@/lib/pricing';
+import { formatPriceRange } from '@/lib/pricing-firestore';
 import { trackEvent } from '@/lib/firebase';
+import { createLead } from '@/lib/leadService';
 import type { Device, LeadFormData } from '@/types';
 
 export default function FormPage() {
@@ -83,27 +84,20 @@ export default function FormPage() {
         images: [], // Will be implemented later
       };
       
-      const response = await fetch('/api/lead', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(leadData),
-      });
+      // Call Firebase directly (no API route needed for static export)
+      const leadId = await createLead(leadData);
       
-      const result = await response.json();
-      
-      if (result.status === 'success') {
+      if (leadId) {
         // Store lead ID for success page
-        localStorage.setItem('leadId', result.lead_id);
+        localStorage.setItem('leadId', leadId);
         trackEvent('form_submitted', {
           brand: device.brand,
           model: device.model,
-          lead_id: result.lead_id,
+          lead_id: leadId,
         });
         router.push('/success');
       } else {
-        throw new Error(result.message || 'เกิดข้อผิดพลาด');
+        throw new Error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
       }
     } catch (error) {
       console.error('Form submission error:', error);

@@ -1,12 +1,34 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read/write access to leads collection for authenticated users
+    // Allow read/write access to leads collection
     match /leads/{leadId} {
       // Allow anyone to create leads (for the public form)
       allow create: if true;
-      // Only allow authenticated users to read/update (for admin)
-      allow read, update: if request.auth != null;
+      // Temporarily allow read access for admin dashboard development
+      // TODO: Implement proper admin authentication
+      allow read, update: if true;
+    }
+    
+    // Allow public read access to brands (for app functionality)
+    match /brands/{brandId} {
+      allow read: if true;
+      // Allow write for development - implement auth later
+      allow write: if true;
+    }
+    
+    // Allow public read access to devices (replaces old pricing collection)
+    match /devices/{deviceId} {
+      allow read: if true;
+      // Allow write for development - implement auth later  
+      allow write: if true;
+    }
+    
+    // Allow read access to metadata for database info
+    match /metadata/{docId} {
+      allow read: if true;
+      // Allow write for development
+      allow write: if true;
     }
     
     // Deny all other access
